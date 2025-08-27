@@ -48,26 +48,26 @@ Our implementation leverages **Bluetooth Low Energy (BLE)** technology, providin
 - **Accessibility-Friendly**: High contrast colors and clear visual hierarchies
 - **Consistent Branding**: Unified color scheme and visual language throughout the app
 
-## ?? How to Play
+## ??? How to Play
 
 ### Quick Play (Local Mode)
 1. Launch the Connect 4 Game app
-2. Tap **"? Start Local Game"** for immediate gameplay
+2. Tap **"?? Start Local Game"** for immediate gameplay
 3. Pass the device between players
-4. Take turns dropping pieces by tapping the column drop buttons (?)
+4. Take turns dropping pieces by tapping the column drop buttons (??)
 5. First to connect 4 pieces wins!
 
 ### Bluetooth Multiplayer
 
 #### Host a Game
-1. Tap **"? Host Bluetooth Game"**
+1. Tap **"?? Host Bluetooth Game"**
 2. Enter your player name
-3. Tap **"? Start Hosting"**
+3. Tap **"?? Start Hosting"**
 4. Share your game name with the other player
 5. Wait for connection and start playing!
 
 #### Join a Game
-1. Tap **"? Scan for Games"**
+1. Tap **"?? Scan for Games"**
 2. Wait for nearby games to appear in the list
 3. Select the desired game
 4. Tap **"Join"** to connect
@@ -82,7 +82,7 @@ Our implementation leverages **Bluetooth Low Energy (BLE)** technology, providin
 - **Draw Condition**: If the board fills completely without a winner, the game ends in a draw
 - **Turn Indicators**: Drop buttons change color to show whose turn it is (Red for Player 1, Blue for Player 2)
 
-## ??? Technical Implementation
+## ?? Technical Implementation
 
 ### Architecture & Design Patterns
 - **MVVM Pattern**: Clean separation of Model, View, and ViewModel layers
@@ -135,9 +135,9 @@ Our custom BLE protocol uses efficient JSON messaging for real-time game synchro
 
 ## ?? Platform Support
 
-- ? **Android** (API 21+ / Android 5.0+)
-- ? **iOS** (11.0+)
-- ? **Windows** (10.0.17763.0+)
+- ?? **Android** (API 21+ / Android 5.0+)
+- ?? **iOS** (11.0+)
+- ?? **Windows** (10.0.17763.0+)
 
 ## ?? Required Permissions
 
@@ -240,9 +240,9 @@ public static class GameBoard
 
 ### **Unicode Symbols**
 All visual elements use Unicode symbols for universal compatibility:
-- **Drop Buttons**: ? (U+2193 Downwards Arrow)
+- **Drop Buttons**: ?? (U+2193 Downwards Arrow)
 - **Player Pieces**: ? (U+25CF Black Circle) and O (U+004F Latin Capital Letter O)
-- **Menu Icons**: ? (U+25B6 Play), ? (U+26A1 Lightning), ? (U+25CB Circle)
+- **Menu Icons**: ?? (U+25B6 Play), ? (U+26A1 Lightning), ? (U+25CB Circle)
 
 ## ?? Troubleshooting
 
@@ -296,4 +296,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-**Ready to play?** Download Connect 4 Game and experience the perfect blend of classic gameplay and modern technology! ???
+**Ready to play?** Download Connect 4 Game and experience the perfect blend of classic gameplay and modern technology! ????
