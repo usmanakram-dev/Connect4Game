@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Connect4Game.ViewModels"
+             xmlns:converters="clr-namespace:Connect4Game.Converters"
+             x:Class="Connect4Game.Views.MainMenuPage"
+             Title=""
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#1a1a2e">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Converters -->
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:CountToBoolConverter x:Key="CountToBoolConverter" />
+            
+            <!-- Platform-specific emoji fonts with fallbacks -->
+            <OnPlatform x:Key="EmojiFont" x:TypeArguments="x:String">
+                <On Platform="Windows" Value="Segoe UI Emoji, Segoe UI Symbol, Arial Unicode MS" />
+                <On Platform="Android" Value="Noto Color Emoji, Noto Emoji, SamsungColorEmoji" />
+                <On Platform="iOS" Value="Apple Color Emoji, Arial Unicode MS" />
+                <On Platform="MacCatalyst" Value="Apple Color Emoji, Arial Unicode MS" />
+            </OnPlatform>
+            
+            <!-- Regular font with emoji support as fallback -->
+            <OnPlatform x:Key="RegularFont" x:TypeArguments="x:String">
+                <On Platform="Windows" Value="Segoe UI, Arial" />
+                <On Platform="Android" Value="Roboto, Noto Sans" />
+                <On Platform="iOS" Value="SF Pro Display, Helvetica" />
+                <On Platform="MacCatalyst" Value="SF Pro Display, Helvetica" />
+            </OnPlatform>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <Grid Padding="20" RowSpacing="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- App Title -->
+            <StackLayout Grid.Row="0" HorizontalOptions="Center">
+                <Label Text="● CONNECT 4 ●" 
+                       FontSize="42" 
+                       FontAttributes="Bold"
+                       FontFamily="{StaticResource EmojiFont}"
+                       TextColor="#FFD700"
+                       HorizontalOptions="Center"/>
+                <Label Text="Bluetooth Multiplayer" 
+                       FontSize="18" 
+                       FontFamily="{StaticResource RegularFont}"
+                       TextColor="#87CEEB"
+                       HorizontalOptions="Center"/>
+            </StackLayout>
+
+            <!-- Local Game Section -->
+            <Frame Grid.Row="1" 
+                   BackgroundColor="#16213e" 
+                   CornerRadius="15" 
+                   HasShadow="True"
+                   Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="▶ Quick Play" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           TextColor="#FFD700"/>
+                    
+                    <Label Text="Start a local game for two players" 
+                           FontSize="14" 
+                           FontFamily="{StaticResource RegularFont}"
+                           TextColor="#87CEEB"/>
+                    
+                    <Button Text="▶ Start Local Game" 
+                            FontFamily="{StaticResource EmojiFont}"
+                            Command="{Binding StartLocalGameCommand}"
+                            BackgroundColor="#e94560"
+                            TextColor="White"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            CornerRadius="25"
+                            HeightRequest="50"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Host Game Section -->
+            <Frame Grid.Row="2" 
+                   BackgroundColor="#16213e" 
+                   CornerRadius="15" 
+                   HasShadow="True"
+                   Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="⚡ Host Bluetooth Game" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           TextColor="#FFD700"/>
+                    
+                    <Entry x:Name="HostNameEntry"
+                           Text="{Binding HostName}"
+                           Placeholder="Enter your name"
+                           PlaceholderColor="#999"
+                           TextColor="White"
+                           FontFamily="{StaticResource RegularFont}"
+                           BackgroundColor="#0f3460"
+                           FontSize="16"/>
+                    
+                    <Button Text="◉ Start Hosting" 
+                            FontFamily="{StaticResource EmojiFont}"
+                            Command="{Binding HostGameCommand}"
+                            BackgroundColor="#0f3460"
+                            TextColor="White"
+                            FontSize="16"
+                            CornerRadius="25"
+                            HeightRequest="45"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Join Game Section -->
+            <Frame Grid.Row="3" 
+                   BackgroundColor="#16213e" 
+                   CornerRadius="15" 
+                   HasShadow="True"
+                   Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="⊕ Join Bluetooth Game" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           TextColor="#FFD700"/>
+                    
+                    <Button Text="◯ Scan for Games" 
+                            FontFamily="{StaticResource EmojiFont}"
+                            Command="{Binding ScanForGamesCommand}"
+                            BackgroundColor="#0f3460"
+                            TextColor="White"
+                            FontSize="16"
+                            CornerRadius="25"
+                            HeightRequest="45"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Available Games List -->
+            <Frame Grid.Row="4" 
+                   BackgroundColor="#16213e" 
+                   CornerRadius="15" 
+                   HasShadow="True"
+                   Padding="20"
+                   IsVisible="{Binding AvailableGames.Count, Converter={StaticResource CountToBoolConverter}}">
+                <StackLayout>
+                    <Label Text="◎ Available Games" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           TextColor="#FFD700"
+                           Margin="0,0,0,10"/>
+                    
+                    <CollectionView ItemsSource="{Binding AvailableGames}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10">
+                                    <Frame BackgroundColor="#0f3460" 
+                                           CornerRadius="10" 
+                                           Padding="15"
+                                           HasShadow="False">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding Name}" 
+                                                   TextColor="White" 
+                                                   FontFamily="{StaticResource RegularFont}"
+                                                   FontSize="16"
+                                                   VerticalOptions="Center"/>
+                                            
+                                            <Button Grid.Column="1"
+                                                    Text="Join"
+                                                    BackgroundColor="#e94560"
+                                                    TextColor="White"
+                                                    FontFamily="{StaticResource RegularFont}"
+                                                    FontSize="14"
+                                                    CornerRadius="15"
+                                                    WidthRequest="80"
+                                                    HeightRequest="35"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainMenuViewModel}}, Path=JoinGameCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                        </Grid>
+                                    </Frame>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+
+            <!-- Status Message -->
+            <Frame Grid.Row="5" 
+                   BackgroundColor="#0f3460" 
+                   CornerRadius="10" 
+                   Padding="15"
+                   HasShadow="False">
+                <StackLayout Orientation="Horizontal" 
+                             HorizontalOptions="Center"
+                             Spacing="10">
+                    <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                       Color="#FFD700" 
+                                       IsVisible="{Binding IsLoading}"/>
+                    <Label Text="{Binding StatusMessage}" 
+                           TextColor="#87CEEB" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </ScrollView>
+</ContentPage>

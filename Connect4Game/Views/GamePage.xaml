@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Connect4Game.ViewModels"
+             x:Class="Connect4Game.Views.GamePage"
+             Title=""
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#1a1a2e">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Platform-specific emoji fonts -->
+            <OnPlatform x:Key="EmojiFont" x:TypeArguments="x:String">
+                <On Platform="Windows" Value="Segoe UI Emoji" />
+                <On Platform="Android" Value="Noto Color Emoji" />
+                <On Platform="iOS" Value="Apple Color Emoji" />
+                <On Platform="MacCatalyst" Value="Apple Color Emoji" />
+            </OnPlatform>
+            
+            <!-- Platform-specific symbol fonts -->
+            <OnPlatform x:Key="SymbolFont" x:TypeArguments="x:String">
+                <On Platform="Windows" Value="Segoe UI Symbol" />
+                <On Platform="Android" Value="Noto Sans Symbols" />
+                <On Platform="iOS" Value="SF Pro Display" />
+                <On Platform="MacCatalyst" Value="SF Pro Display" />
+            </OnPlatform>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <Grid Padding="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Game Status Header -->
+            <Frame Grid.Row="0" 
+                   BackgroundColor="#16213e" 
+                   CornerRadius="15" 
+                   Padding="20" 
+                   Margin="5"
+                   HasShadow="True">
+                <StackLayout>
+                    <Label Text="{Binding GameStatusText}" 
+                           FontSize="24" 
+                           FontAttributes="Bold" 
+                           TextColor="#FFD700" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           HorizontalOptions="Center"/>
+                    
+                    <Label Text="{Binding CurrentPlayerText}" 
+                           FontSize="18" 
+                           TextColor="#87CEEB" 
+                           FontFamily="{StaticResource EmojiFont}"
+                           HorizontalOptions="Center"
+                           IsVisible="{Binding IsGameActive}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Column Drop Buttons -->
+            <Frame Grid.Row="1" 
+                   BackgroundColor="#16213e" 
+                   HasShadow="False"
+                   Padding="0" 
+                   Margin="5,10">
+                <Grid ColumnDefinitions="*,*,*,*,*,*,*" 
+                      ColumnSpacing="2"
+					  Padding="5"
+                      HorizontalOptions="Center">
+                    
+                    <Button Grid.Column="0"
+                            Text="O" 
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="0"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                    
+                    <Button Grid.Column="1"
+                            Text="O"
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="1"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                    
+                    <Button Grid.Column="2"
+                            Text="O"
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="2"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                    
+                    <Button Grid.Column="3"
+                            Text="O"
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="3"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                    
+                    <Button Grid.Column="4"
+                            Text="O"
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="4"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                    
+                    <Button Grid.Column="5"
+                            Text="O"
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="5"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                    
+                    <Button Grid.Column="6"
+                            Text="O"
+                            Style="{StaticResource GamePage_Button}"
+                            BackgroundColor="{Binding CurrentPlayerButtonColor}" 
+                            Command="{Binding DropPieceCommand}" 
+                            CommandParameter="6"
+                            IsEnabled="{Binding IsGameActive}"
+                            HorizontalOptions="Center"/>
+                </Grid>
+            </Frame>
+
+            <!-- Game Board -->
+            <Frame Grid.Row="2" 
+                   BackgroundColor="#16213e" 
+                   CornerRadius="20" 
+                   Padding="5" 
+                   Margin="5,5,5,5"
+                   HasShadow="True">
+                
+                <Grid RowDefinitions="*,*,*,*,*,*"
+                      ColumnDefinitions="*,*,*,*,*,*,*"
+                      ColumnSpacing="2"
+                      RowSpacing="12"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center">
+                    
+                    <!-- Row 0 (Top) -->
+                    <Border Grid.Row="0" Grid.Column="0" 
+                            BackgroundColor="{Binding Cell00.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell00.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="1" 
+                            BackgroundColor="{Binding Cell01.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell01.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="2" 
+                            BackgroundColor="{Binding Cell02.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell02.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="3" 
+                            BackgroundColor="{Binding Cell03.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell03.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="4" 
+                            BackgroundColor="{Binding Cell04.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell04.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="5" 
+                            BackgroundColor="{Binding Cell05.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell05.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="6" 
+                            BackgroundColor="{Binding Cell06.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell06.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <!-- Row 1 -->
+                    <Border Grid.Row="1" Grid.Column="0" 
+                            BackgroundColor="{Binding Cell10.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell10.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="1" 
+                            BackgroundColor="{Binding Cell11.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell11.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="2" 
+                            BackgroundColor="{Binding Cell12.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell12.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="3" 
+                            BackgroundColor="{Binding Cell13.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell13.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="4" 
+                            BackgroundColor="{Binding Cell14.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell14.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="5" 
+                            BackgroundColor="{Binding Cell15.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell15.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="6" 
+                            BackgroundColor="{Binding Cell16.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell16.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <!-- Row 2 -->
+                    <Border Grid.Row="2" Grid.Column="0" 
+                            BackgroundColor="{Binding Cell20.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell20.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Grid.Column="1" 
+                            BackgroundColor="{Binding Cell21.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell21.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Grid.Column="2" 
+                            BackgroundColor="{Binding Cell22.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell22.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Grid.Column="3" 
+                            BackgroundColor="{Binding Cell23.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell23.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Grid.Column="4" 
+                            BackgroundColor="{Binding Cell24.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell24.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Grid.Column="5" 
+                            BackgroundColor="{Binding Cell25.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell25.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Grid.Column="6" 
+                            BackgroundColor="{Binding Cell26.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell26.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <!-- Row 3 -->
+                    <Border Grid.Row="3" Grid.Column="0" 
+                            BackgroundColor="{Binding Cell30.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell30.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="3" Grid.Column="1" 
+                            BackgroundColor="{Binding Cell31.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell31.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="3" Grid.Column="2" 
+                            BackgroundColor="{Binding Cell32.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell32.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="3" Grid.Column="3" 
+                            BackgroundColor="{Binding Cell33.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell33.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="3" Grid.Column="4" 
+                            BackgroundColor="{Binding Cell34.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell34.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="3" Grid.Column="5" 
+                            BackgroundColor="{Binding Cell35.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell35.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="3" Grid.Column="6" 
+                            BackgroundColor="{Binding Cell36.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell36.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <!-- Row 4 -->
+                    <Border Grid.Row="4" Grid.Column="0" 
+                            BackgroundColor="{Binding Cell40.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell40.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="4" Grid.Column="1" 
+                            BackgroundColor="{Binding Cell41.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell41.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="4" Grid.Column="2" 
+                            BackgroundColor="{Binding Cell42.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell42.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="4" Grid.Column="3" 
+                            BackgroundColor="{Binding Cell43.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell43.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="4" Grid.Column="4" 
+                            BackgroundColor="{Binding Cell44.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell44.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="4" Grid.Column="5" 
+                            BackgroundColor="{Binding Cell45.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell45.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="4" Grid.Column="6" 
+                            BackgroundColor="{Binding Cell46.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell46.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <!-- Row 5 (Bottom) -->
+                    <Border Grid.Row="5" Grid.Column="0" 
+                            BackgroundColor="{Binding Cell50.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell50.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Grid.Column="1" 
+                            BackgroundColor="{Binding Cell51.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell51.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Grid.Column="2" 
+                            BackgroundColor="{Binding Cell52.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell52.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Grid.Column="3" 
+                            BackgroundColor="{Binding Cell53.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell53.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Grid.Column="4" 
+                            BackgroundColor="{Binding Cell54.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell54.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Grid.Column="5" 
+                            BackgroundColor="{Binding Cell55.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell55.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Grid.Column="6" 
+                            BackgroundColor="{Binding Cell56.BackgroundColor}" 
+                            Stroke="#FFD700" StrokeThickness="2"
+                            WidthRequest="50" HeightRequest="50"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="25"/></Border.StrokeShape>
+                        <Label Text="{Binding Cell56.DisplayText}" 
+                               FontSize="32" FontAttributes="Bold" FontFamily="{StaticResource SymbolFont}"
+                               TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                </Grid>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Grid Grid.Row="3" 
+                  ColumnDefinitions="*,*" 
+                  ColumnSpacing="10" 
+                  Margin="10">
+                
+                <Button Grid.Column="0" 
+                        Text="↻ Reset Game" 
+                        FontFamily="{StaticResource SymbolFont}"
+                        BackgroundColor="#0f3460" 
+                        TextColor="White"
+                        FontSize="16"
+                        CornerRadius="25"
+                        HeightRequest="50"
+                        Command="{Binding ResetGameCommand}"/>
+                
+                <Button Grid.Column="1" 
+                        Text="← Leave Game" 
+                        FontFamily="{StaticResource SymbolFont}"
+                        BackgroundColor="#8B0000" 
+                        TextColor="White"
+                        FontSize="16"
+                        CornerRadius="25"
+                        HeightRequest="50"
+                        Command="{Binding LeaveGameCommand}"/>
+            </Grid>
+        </Grid>
+    </ScrollView>
+</ContentPage>
